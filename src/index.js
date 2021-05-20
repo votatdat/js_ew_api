@@ -3,17 +3,12 @@ import dotenv from 'dotenv';
 import { ApolloServer, gql } from 'apollo-server-express';
 
 import connectDB from './db.js';
+import models from './models/index.js';
 
 dotenv.config();
 
 const port = process.env.PORT || 4000;
-const MONGO_URI = process.env.MONGO_URI
-
-let notes = [
-  { id: '1', content: 'This is a note', author: 'Adam Scott' },
-  { id: '2', content: 'This is another note', author: 'Harlow Everly' },
-  { id: '3', content: 'Oh hey look, another note!', author: 'Riley Harrison' }
-];
+const MONGO_URI = process.env.MONGO_URI;
 
 // Construct a schema, using GraphQL's schema language
 const typeDefs = gql`
@@ -28,7 +23,7 @@ const typeDefs = gql`
         note(id: ID!): Note!
     }
     type Mutation {
-        newNote(content: String): Note!
+        newNote(content: String!): Note!
     }
 `;
 
@@ -36,19 +31,17 @@ const typeDefs = gql`
 const resolvers = {
   Query: {
     hello: () => 'Hello World!',
-    notes: () => notes,
-    note: (parent, args) =>
-      notes.find(note => note.id === args.id)
+    notes: () => async () => await models.Note.find(),
+    note: async (parent, args) =>
+      await models.Note.findById(args.id)
   },
   Mutation: {
-    newNote: (parent, args) => {
+    newNote: async (parent, args) => {
       let newNote = {
-        id: String(notes.length + 1),
         content: args.content,
         author: 'new author',
       };
-      notes.push(newNote);
-      return newNote;
+      return await models.Note.create(newNote);
     }
   }
 
