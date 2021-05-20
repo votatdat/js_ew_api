@@ -24,6 +24,9 @@ const typeDefs = gql`
         notes: [Note!]!
         note(id: ID!): Note!
     }
+    type Mutation {
+        newNote(content: String): Note!
+    }
 `;
 
 // Provide resolver functions for our schema fields
@@ -33,7 +36,19 @@ const resolvers = {
     notes: () => notes,
     note: (parent, args) =>
       notes.find(note => note.id === args.id)
+  },
+  Mutation: {
+    newNote: (parent, args) => {
+      let newNote = {
+        id: String(notes.length + 1),
+        content: args.content,
+        author: "new author",
+      }
+      notes.push(newNote)
+      return newNote
+    }
   }
+
 };
 
 const app = express();
