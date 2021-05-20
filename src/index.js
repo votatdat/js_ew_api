@@ -1,10 +1,13 @@
-import express from "express";
-import dotenv from "dotenv";
-import { ApolloServer, gql } from "apollo-server-express";
+import express from 'express';
+import dotenv from 'dotenv';
+import { ApolloServer, gql } from 'apollo-server-express';
+
+import connectDB from './db.js';
 
 dotenv.config();
 
 const port = process.env.PORT || 4000;
+const MONGO_URI = process.env.MONGO_URI
 
 let notes = [
   { id: '1', content: 'This is a note', author: 'Adam Scott' },
@@ -32,7 +35,7 @@ const typeDefs = gql`
 // Provide resolver functions for our schema fields
 const resolvers = {
   Query: {
-    hello: () => "Hello World!",
+    hello: () => 'Hello World!',
     notes: () => notes,
     note: (parent, args) =>
       notes.find(note => note.id === args.id)
@@ -42,10 +45,10 @@ const resolvers = {
       let newNote = {
         id: String(notes.length + 1),
         content: args.content,
-        author: "new author",
-      }
-      notes.push(newNote)
-      return newNote
+        author: 'new author',
+      };
+      notes.push(newNote);
+      return newNote;
     }
   }
 
@@ -53,10 +56,13 @@ const resolvers = {
 
 const app = express();
 
+// Connect to the database
+connectDB(MONGO_URI);
+
 // Apollo Server setup
 const server = new ApolloServer({ typeDefs, resolvers });
 // Apply the Apollo GraphQL middleware and set the path to /api
-server.applyMiddleware({ app, path: "/api" });
+server.applyMiddleware({ app, path: '/api' });
 
 app.listen({ port }, () =>
   console.log(
