@@ -1,4 +1,9 @@
+import pkg from 'graphql-iso-date';
+
+const { GraphQLDateTime } = pkg;
+
 const noteResolvers = {
+  DateTime: GraphQLDateTime,
   Query: {
     hello: () => 'Hello World!',
     notes: async (parent, args, { noteModel }) =>
