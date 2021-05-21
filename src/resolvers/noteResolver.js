@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import pkg from 'graphql-iso-date';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
@@ -21,10 +22,13 @@ const noteResolvers = {
       await noteModel.findById(id)
   },
   Mutation: {
-    newNote: async (parent, { content }, { noteModel }) => {
+    newNote: async (parent, { content }, { noteModel, user }) => {
+      if (!user) {
+        throw new AuthenticationError('You must sign in!');
+      }
       let newNote = {
         content: content,
-        author: 'new author',
+        author: mongoose.Types.ObjectId(user.id)
       };
       return await noteModel.create(newNote);
     },
