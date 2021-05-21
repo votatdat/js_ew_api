@@ -19,6 +19,6 @@ const noteSchema = new mongoose.Schema(
 );
 
 // Define the 'Note' model with the schema
-const Note = mongoose.model('Note', noteSchema);
+const noteModel = mongoose.model('Note', noteSchema);
 
-export default Note;
+export default noteModel;

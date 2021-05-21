@@ -1,51 +1,16 @@
 import express from 'express';
 import dotenv from 'dotenv';
-import { ApolloServer, gql } from 'apollo-server-express';
+import { ApolloServer } from 'apollo-server-express';
 
+import noteResolver from './resolvers/noteResolver.js';
+import noteSchema from './schemas/noteSchema.js';
+import noteModel from './models/noteModel.js';
 import connectDB from './db.js';
-import models from './models/index.js';
 
 dotenv.config();
 
 const port = process.env.PORT || 4000;
 const MONGO_URI = process.env.MONGO_URI;
-
-// Construct a schema, using GraphQL's schema language
-const typeDefs = gql`
-    type Note {
-        id: ID!
-        content: String!
-        author: String!
-    }
-    type Query {
-        hello: String
-        notes: [Note!]!
-        note(id: ID!): Note!
-    }
-    type Mutation {
-        newNote(content: String!): Note!
-    }
-`;
-
-// Provide resolver functions for our schema fields
-const resolvers = {
-  Query: {
-    hello: () => 'Hello World!',
-    notes: () => async () => await models.Note.find(),
-    note: async (parent, args) =>
-      await models.Note.findById(args.id)
-  },
-  Mutation: {
-    newNote: async (parent, args) => {
-      let newNote = {
-        content: args.content,
-        author: 'new author',
-      };
-      return await models.Note.create(newNote);
-    }
-  }
-
-};
 
 const app = express();
 
@@ -53,7 +18,11 @@ const app = express();
 connectDB(MONGO_URI);
 
 // Apollo Server setup
-const server = new ApolloServer({ typeDefs, resolvers });
+const server = new ApolloServer({
+  typeDefs: noteSchema,
+  resolvers: noteResolver,
+  context: () => noteModel
+});
 // Apply the Apollo GraphQL middleware and set the path to /api
 server.applyMiddleware({ app, path: '/api' });
 
