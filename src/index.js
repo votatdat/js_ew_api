@@ -21,7 +21,9 @@ connectDB(MONGO_URI);
 const server = new ApolloServer({
   typeDefs: noteSchema,
   resolvers: noteResolver,
-  context: () => noteModel
+  context: () => {
+    return { noteModel };
+  }
 });
 // Apply the Apollo GraphQL middleware and set the path to /api
 server.applyMiddleware({ app, path: '/api' });
