@@ -5,6 +5,7 @@ import { ApolloServer } from 'apollo-server-express';
 import noteResolver from './resolvers/noteResolver.js';
 import noteSchema from './schemas/noteSchema.js';
 import noteModel from './models/noteModel.js';
+import userModel from './models/userModel.js';
 import connectDB from './db.js';
 
 dotenv.config();
@@ -22,7 +23,7 @@ const server = new ApolloServer({
   typeDefs: noteSchema,
   resolvers: noteResolver,
   context: () => {
-    return { noteModel };
+    return { noteModel, userModel };
   }
 });
 // Apply the Apollo GraphQL middleware and set the path to /api
