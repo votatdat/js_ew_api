@@ -1,13 +1,15 @@
 import { gql } from 'apollo-server-express';
 
-const noteSchema = gql`
+export default gql`
     scalar DateTime
     type Note {
         id: ID!
         content: String!
-        author: String!
+        author: User!
         createdAt: DateTime!
         updatedAt: DateTime!
+        favoriteCount: Int!
+        favoritedBy: [User]
     }
     type User {
         id: ID!
@@ -15,9 +17,9 @@ const noteSchema = gql`
         email: String!
         avatar: String!
         notes: [Note!]!
+        favorites: [Note!]!
     }
     type Query {
-        hello: String
         notes: [Note!]!
         note(id: ID!): Note!
 
@@ -29,10 +31,9 @@ const noteSchema = gql`
         newNote(content: String!): Note!
         updateNote(id: ID!, content: String!): Note!
         deleteNote(id: ID!): Boolean!
-        
+        toggleFavorite(id: ID!): Note!
+
         signUp(username: String!, email: String!, password: String!): String!
         signIn(username: String, email: String, password: String!): String!
     }
 `;
-
-export default noteSchema;

@@ -2,8 +2,8 @@ import express from 'express';
 import dotenv from 'dotenv';
 import { ApolloServer } from 'apollo-server-express';
 
-import noteResolver from './resolvers/noteResolver.js';
-import noteSchema from './schemas/noteSchema.js';
+import resolvers from './resolvers/index.js';
+import schema from './schemas/noteSchema.js';
 import noteModel from './models/noteModel.js';
 import userModel from './models/userModel.js';
 import connectDB from './db.js';
@@ -21,8 +21,8 @@ connectDB(MONGO_URI);
 
 // Apollo Server setup
 const server = new ApolloServer({
-  typeDefs: noteSchema,
-  resolvers: noteResolver,
+  typeDefs: schema,
+  resolvers: resolvers,
   context: ({ req }) => {
     // get the user token from the headers
     const token = req.headers.authorization;
