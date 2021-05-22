@@ -6,7 +6,6 @@ import {
   AuthenticationError,
   ForbiddenError
 } from 'apollo-server-express';
-import dotenv from 'dotenv';
 import gravatar from '../util/gravatar.js';
 
 const { GraphQLDateTime } = pkg;
@@ -19,7 +18,20 @@ const noteResolvers = {
     notes: async (parent, args, { noteModel }) =>
       await noteModel.find(),
     note: async (parent, { id }, { noteModel }) =>
-      await noteModel.findById(id)
+      await noteModel.findById(id),
+
+    user: async (parent, { username }, { userModel }) => {
+      // find a user given their username
+      return await userModel.findOne({ username });
+    },
+    users: async (parent, args, { userModel }) => {
+      // find all users
+      return await userModel.find({});
+    },
+    me: async (parent, args, { userModel, user }) => {
+      // find a user given the current user context
+      return await userModel.findById(user.id);
+    },
   },
   Mutation: {
     newNote: async (parent, { content }, { noteModel, user }) => {
@@ -77,6 +89,7 @@ const noteResolvers = {
         }
       );
     },
+
     signUp: async (parent, { username, email, password }, { userModel }) => {
       email = email.trim().toLowerCase();
       const hashed = await bcrypt.hash(password, 10);
@@ -113,7 +126,7 @@ const noteResolvers = {
       }
       // create and return the json web token
       return jwt.sign({ id: user._id }, process.env.JWT_SECRET);
-    }
+    },
   }
 };
 
