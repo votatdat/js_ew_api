@@ -1,11 +1,12 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import { ApolloServer } from 'apollo-server-express';
+import { makeExecutableSchema } from '@graphql-tools/schema';
 
-import noteResolver from './resolvers/noteResolver.js';
-import noteSchema from './schemas/noteSchema.js';
 import noteModel from './models/noteModel.js';
 import userModel from './models/userModel.js';
+import typeDefs from './resolvers/index.js';
+import resolvers from './schemas/index.js';
 import connectDB from './db.js';
 import getUser from './util/getUser.js';
 
@@ -19,10 +20,14 @@ const app = express();
 // Connect to the database
 connectDB(MONGO_URI);
 
+const schema = makeExecutableSchema({
+  typeDefs,
+  resolvers,
+});
+
 // Apollo Server setup
 const server = new ApolloServer({
-  typeDefs: noteSchema,
-  resolvers: noteResolver,
+  schema,
   context: ({ req }) => {
     // get the user token from the headers
     const token = req.headers.authorization;
