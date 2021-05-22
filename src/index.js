@@ -1,9 +1,11 @@
 import express from 'express';
+import helmet from 'helmet';
+import cors from 'cors';
 import dotenv from 'dotenv';
 import { ApolloServer } from 'apollo-server-express';
 
 import resolvers from './resolvers/index.js';
-import schema from './schemas/noteSchema.js';
+import schema from './schemas/shema.js';
 import noteModel from './models/noteModel.js';
 import userModel from './models/userModel.js';
 import connectDB from './db.js';
@@ -15,6 +17,8 @@ const port = process.env.PORT || 4000;
 const MONGO_URI = process.env.MONGO_URI;
 
 const app = express();
+app.use(helmet());
+app.use(cors());
 
 // Connect to the database
 connectDB(MONGO_URI);
